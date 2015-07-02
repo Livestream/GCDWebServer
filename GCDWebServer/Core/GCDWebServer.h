@@ -164,6 +164,13 @@ extern NSString* const GCDWebServerOption_AutomaticallyMapHEADToGET;
  */
 extern NSString* const GCDWebServerOption_ConnectedStateCoalescingInterval;
 
+/**
+ *  TXT record dictionary (NSDictionary)
+ *
+ *  The default value is nil
+ */
+extern NSString* const GCDWebServerOption_TXTRecordDictionary;
+
 #if TARGET_OS_IPHONE
 
 /**

@@ -59,6 +59,7 @@ NSString* const GCDWebServerOption_AuthenticationAccounts = @"AuthenticationAcco
 NSString* const GCDWebServerOption_ConnectionClass = @"ConnectionClass";
 NSString* const GCDWebServerOption_AutomaticallyMapHEADToGET = @"AutomaticallyMapHEADToGET";
 NSString* const GCDWebServerOption_ConnectedStateCoalescingInterval = @"ConnectedStateCoalescingInterval";
+NSString* const GCDWebServerOption_TXTRecordDictionary = @"TXTRecordDictionary";
 #if TARGET_OS_IPHONE
 NSString* const GCDWebServerOption_AutomaticallySuspendInBackground = @"AutomaticallySuspendInBackground";
 #endif
@@ -565,7 +566,14 @@ static inline NSString* _EncodeBase64(NSString* string) {
     _registrationService = CFNetServiceCreate(kCFAllocatorDefault, CFSTR("local."), (__bridge CFStringRef)bonjourType, (__bridge CFStringRef)(bonjourName.length ? bonjourName : _serverName), (SInt32)_port);
     if (_registrationService) {
       CFNetServiceClientContext context = {0, (__bridge void*)self, NULL, NULL, NULL};
-      
+
+      NSDictionary *txtRecord = _GetOption(_options, GCDWebServerOption_TXTRecordDictionary, nil);
+      if ((txtRecord != nil) && [txtRecord isKindOfClass:[NSDictionary class]]) {
+        CFDataRef txtRecordData = CFNetServiceCreateTXTDataWithDictionary(kCFAllocatorDefault, (__bridge CFDictionaryRef)txtRecord);
+        CFNetServiceSetTXTData(_registrationService, txtRecordData);
+        CFRelease(txtRecordData);
+      }
+
       CFNetServiceSetClient(_registrationService, _NetServiceRegisterCallBack, &context);
       CFNetServiceScheduleWithRunLoop(_registrationService, CFRunLoopGetMain(), kCFRunLoopCommonModes);
       CFStreamError streamError = {0};
